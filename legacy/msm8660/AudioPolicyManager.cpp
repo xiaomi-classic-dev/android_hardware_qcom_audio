@@ -303,8 +303,8 @@ status_t AudioPolicyManager::setDeviceConnectionState(audio_devices_t device,
                     mScoDeviceAddress = String8(device_address, MAX_DEVICE_ADDRESS_LEN);
                 } else if (audio_is_usb_device(device)) {
                     // handle USB device connection
-                    mUsbCardAndDevice = String8(device_address, MAX_DEVICE_ADDRESS_LEN);
-                    paramStr = mUsbCardAndDevice;
+                    mUsbOutCardAndDevice = String8(device_address, MAX_DEVICE_ADDRESS_LEN);
+                    paramStr = mUsbOutCardAndDevice;
                 }
                 // not currently handling multiple simultaneous submixes: ignoring remote submix
                 //   case and address
@@ -341,7 +341,7 @@ status_t AudioPolicyManager::setDeviceConnectionState(audio_devices_t device,
                 mScoDeviceAddress = "";
             } else if (audio_is_usb_device(device)) {
                 // handle USB device disconnection
-                mUsbCardAndDevice = "";
+                mUsbOutCardAndDevice = "";
 
                 AudioParameter param;
                 param.add(String8("usb_connected"), String8("false"));
@@ -487,7 +487,7 @@ AudioSystem::device_connection_state AudioPolicyManager::getDeviceConnectionStat
                 return state;
             }
             if (audio_is_usb_device(device) &&
-                ((address != "" && mUsbCardAndDevice != address))) {
+                ((address != "" && mUsbOutCardAndDevice != address))) {
                 ALOGE("getDeviceConnectionState() invalid device: %x", device);
                 return state;
             }

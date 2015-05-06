@@ -719,8 +719,8 @@ void AudioPolicyManager::setForceUse(AudioSystem::force_use usage, AudioSystem::
 
 audio_io_handle_t AudioPolicyManager::getOutput(AudioSystem::stream_type stream,
                                     uint32_t samplingRate,
-                                    uint32_t format,
-                                    uint32_t channelMask,
+                                    audio_format_t format,
+                                    audio_channel_mask_t channelMask,
                                     AudioSystem::output_flags flags,
                                     const audio_offload_info_t *offloadInfo)
 {
@@ -802,8 +802,8 @@ audio_io_handle_t AudioPolicyManager::getOutput(AudioSystem::stream_type stream,
         outputDesc = new AudioOutputDescriptor(profile);
         outputDesc->mDevice = device;
         outputDesc->mSamplingRate = samplingRate;
-        outputDesc->mFormat = (audio_format_t)format;
-        outputDesc->mChannelMask = (audio_channel_mask_t)channelMask;
+        outputDesc->mFormat = format;
+        outputDesc->mChannelMask = channelMask;
         outputDesc->mLatency = 0;
         outputDesc->mFlags =(audio_output_flags_t) (outputDesc->mFlags | flags);
         outputDesc->mRefCount[stream] = 0;
@@ -842,7 +842,7 @@ audio_io_handle_t AudioPolicyManager::getOutput(AudioSystem::stream_type stream,
     // ignoring channel mask due to downmix capability in mixer
 
     // for non direct outputs, only PCM is supported
-    if (audio_is_linear_pcm((audio_format_t)format)) {
+    if (audio_is_linear_pcm(format)) {
         // get which output is suitable for the specified stream. The actual
         // routing change will happen when startOutput() will be called
     SortedVector<audio_io_handle_t> outputs = getOutputsForDevice(device, mOutputs);
@@ -963,7 +963,7 @@ status_t AudioPolicyManager::stopOutput(audio_io_handle_t output,
         if (outputDesc->mRefCount[stream] == 0) {
             outputDesc->mStopTime[stream] = systemTime();
 
-            if ((outputDesc->mRefCount[AUDIO_STREAM_RING]!= 0) && (stream == AUDIO_STREAM_VOICE_CALL)) {
+            if ((outputDesc->mRefCount[AUDIO_STREAM_RING]!= 0) && (stream == AudioSystem::VOICE_CALL)) {
                  // When AUDIO_STREAM_RING is present, Send Mute on RING
                  // if it gets stopOutput on  AUDIO_STREAM_VOICE_CALL
                  setStreamMute(AudioSystem::RING, true, mPrimaryOutput);
@@ -1005,8 +1005,8 @@ status_t AudioPolicyManager::stopOutput(audio_io_handle_t output,
 
 audio_io_handle_t AudioPolicyManager::getInput(int inputSource,
                                     uint32_t samplingRate,
-                                    uint32_t format,
-                                    uint32_t channelMask,
+                                    audio_format_t format,
+                                    audio_channel_mask_t channelMask,
                                     AudioSystem::audio_in_acoustics acoustics)
 {
     audio_io_handle_t input = 0;
@@ -1056,8 +1056,8 @@ audio_io_handle_t AudioPolicyManager::getInput(int inputSource,
     inputDesc->mInputSource = inputSource;
     inputDesc->mDevice = device;
     inputDesc->mSamplingRate = samplingRate;
-    inputDesc->mFormat = (audio_format_t)format;
-    inputDesc->mChannelMask = (audio_channel_mask_t)channelMask;
+    inputDesc->mFormat = format;
+    inputDesc->mChannelMask = channelMask;
     inputDesc->mRefCount = 0;
     input = mpClientInterface->openInput(profile->mModule->mHandle,
                                     &inputDesc->mDevice,
@@ -1070,7 +1070,7 @@ audio_io_handle_t AudioPolicyManager::getInput(int inputSource,
         (samplingRate != inputDesc->mSamplingRate) ||
         (format != inputDesc->mFormat) ||
         (channelMask != inputDesc->mChannelMask)) {
-        ALOGV("getInput() failed opening input: samplingRate %d, format %d, channelMask %d",
+        ALOGI("getInput() failed opening input: samplingRate %d, format %d, channelMask %x",
                 samplingRate, format, channelMask);
         if (input != 0) {
             mpClientInterface->closeInput(input);
@@ -1407,7 +1407,7 @@ status_t AudioPolicyManager::checkOutputsForDevice(audio_devices_t device,
                     }
                     if (profile->mChannelMasks[0] == 0) {
                         profile->mChannelMasks.clear();
-                        profile->mChannelMasks.add((audio_channel_mask_t)0);
+                        profile->mChannelMasks.add(0);
                     }
                 }
             }
@@ -1475,6 +1475,7 @@ AudioPolicyManager::routing_strategy AudioPolicyManager::getStrategy(
         // while key clicks are played produces a poor result
     case AudioSystem::TTS:
     case AudioSystem::MUSIC:
+    case AudioSystem::INCALL_MUSIC:
 #ifdef QCOM_FM_ENABLED
     case AudioSystem::FM:
 #endif
@@ -1606,7 +1607,7 @@ audio_devices_t AudioPolicyManager::getDeviceForStrategy(routing_strategy strate
             }
             break;
         }
-#if defined(QCOM_FM_ENABLED) || defined(STE_FM)
+#ifdef QCOM_FM_ENABLED
         if (mAvailableOutputDevices & AUDIO_DEVICE_OUT_FM) {
             if (mForceUse[AudioSystem::FOR_MEDIA] == AudioSystem::FORCE_SPEAKER) {
                 device &= ~(AUDIO_DEVICE_OUT_WIRED_HEADSET);
@@ -1691,7 +1692,7 @@ audio_devices_t AudioPolicyManager::getDeviceForStrategy(routing_strategy strate
             if (device2 == AUDIO_DEVICE_NONE) {
                 device2 = mAvailableOutputDevices & AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET;
             }
-#if defined(QCOM_FM_ENABLED) || defined(STE_FM)
+#ifdef QCOM_FM_ENABLED
             if (device2 == AUDIO_DEVICE_NONE) {
                 device2 = mAvailableOutputDevices & AUDIO_DEVICE_OUT_FM_TX;
             }
@@ -1847,7 +1848,7 @@ audio_devices_t AudioPolicyManager::getDeviceForInputSource(int inputSource)
             device = AUDIO_DEVICE_IN_REMOTE_SUBMIX;
         }
         break;
-#if defined(QCOM_FM_ENABLED) || defined(STE_FM)
+#ifdef QCOM_FM_ENABLED
    case AUDIO_SOURCE_FM_RX:
         device = AUDIO_DEVICE_IN_FM_RX;
         break;
@@ -1903,13 +1904,11 @@ AudioPolicyManager::device_category AudioPolicyManager::getDeviceCategory(audio_
             return DEVICE_CATEGORY_EARPIECE;
         case AUDIO_DEVICE_OUT_WIRED_HEADSET:
         case AUDIO_DEVICE_OUT_WIRED_HEADPHONE:
-        case AUDIO_DEVICE_OUT_ANC_HEADSET:
-        case AUDIO_DEVICE_OUT_ANC_HEADPHONE:
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
         case AUDIO_DEVICE_OUT_BLUETOOTH_A2DP:
         case AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES:
-#if defined(QCOM_FM_ENABLED) || defined(STE_FM)
+#ifdef QCOM_FM_ENABLED
         case AUDIO_DEVICE_OUT_FM:
 #endif
             return DEVICE_CATEGORY_HEADSET;
@@ -2082,8 +2081,8 @@ void AudioPolicyManager::handleNotificationRoutingForStream(AudioSystem::stream_
 AudioPolicyManagerBase::IOProfile *AudioPolicyManager::getProfileForDirectOutput(
                                                                audio_devices_t device,
                                                                uint32_t samplingRate,
-                                                               uint32_t format,
-                                                               uint32_t channelMask,
+                                                               audio_format_t format,
+                                                               audio_channel_mask_t channelMask,
                                                                audio_output_flags_t flags)
 {
     if( !((flags & AUDIO_OUTPUT_FLAG_LPA)   ||
@@ -2112,9 +2111,9 @@ AudioPolicyManagerBase::IOProfile *AudioPolicyManager::getProfileForDirectOutput
 bool AudioPolicyManager::isCompatibleProfile(AudioPolicyManagerBase::IOProfile *profile,
                                              audio_devices_t device,
                                              uint32_t samplingRate,
-                                             uint32_t format,
-                                             uint32_t channelMask,
-                                            audio_output_flags_t flags)
+                                             audio_format_t format,
+                                             audio_channel_mask_t channelMask,
+                                             audio_output_flags_t flags)
 {
     if ((profile->mSupportedDevices & device) != device) {
         return false;

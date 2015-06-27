@@ -3,29 +3,28 @@
 
 LOCAL_PATH := $(call my-dir)
 
-common_cflags := -D_POSIX_SOURCE
-ifeq ($(strip $(QCOM_FM_ENABLED)),true)
+ifeq ($(BOARD_HAVE_BLUETOOTH),true)
+  common_cflags += -DWITH_A2DP
+endif
+
+ifeq ($(QCOM_FM_ENABLED),true)
   common_cflags += -DQCOM_FM_ENABLED
 endif
 
-ifneq ($(strip $(QCOM_TUNNEL_LPA_ENABLED)),false)
+ifneq ($(BOARD_QCOM_TUNNEL_LPA_ENABLED),false)
   common_cflags += -DQCOM_TUNNEL_LPA_ENABLED
 endif
 
-ifeq ($(strip $(QCOM_VOIP_ENABLED)),true)
+ifeq ($(BOARD_QCOM_VOIP_ENABLED),true)
   common_cflags += -DQCOM_VOIP_ENABLED
 endif
 
-ifneq ($(strip $(QCOM_TUNNEL_LPA_ENABLED)),false)
+ifeq ($(BOARD_QCOM_TUNNEL_PLAYBACK_ENABLED),true)
   common_cflags += -DTUNNEL_PLAYBACK
 endif
 
-ifneq ($(strip $(QCOM_ACDB_ENABLED)),false)
+ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
   common_cflags += -DQCOM_ACDB_ENABLED
-endif
-
-ifeq ($(BOARD_HAVE_BLUETOOTH),true)
-  common_cflags += -DWITH_A2DP
 endif
 
 ifeq ($(BOARD_HAVE_SAMSUNG_AUDIO),true)

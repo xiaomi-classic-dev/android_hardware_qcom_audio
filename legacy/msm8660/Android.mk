@@ -40,10 +40,10 @@ ifeq ($(BOARD_HAVE_BACK_MIC_CAMCORDER),true)
   common_cflags += -DBACK_MIC_CAMCORDER
 endif
 
-
 include $(CLEAR_VARS)
 
 LOCAL_ARM_MODE := arm
+LOCAL_CFLAGS := -D_POSIX_SOURCE
 
 LOCAL_SRC_FILES := \
     AudioHardware.cpp \
@@ -65,10 +65,8 @@ $(shell touch $(OUT)/obj/SHARED_LIBRARIES/libacdbloader_intermediates/export_inc
 $(shell mkdir -p $(OUT)/obj/SHARED_LIBRARIES/libacdbmapper_intermediates/)
 $(shell touch $(OUT)/obj/SHARED_LIBRARIES/libacdbmapper_intermediates/export_includes)
 
-ifeq ($(TARGET_SIMULATOR),true)
- LOCAL_LDLIBS += -ldl
-else
- LOCAL_SHARED_LIBRARIES += libdl
+ifneq ($(TARGET_SIMULATOR),true)
+LOCAL_SHARED_LIBRARIES += libdl
 endif
 
 LOCAL_STATIC_LIBRARIES := \

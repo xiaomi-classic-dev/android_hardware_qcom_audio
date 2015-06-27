@@ -80,6 +80,8 @@ LOCAL_MODULE := audio.primary.msm8660
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_CFLAGS += -fno-short-enums
+
 LOCAL_C_INCLUDES := $(TARGET_OUT_HEADERS)/mm-audio/audio-alsa
 LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)/mm-audio/audcal
 LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)/mm-audio/audio-acdb-util
@@ -87,7 +89,6 @@ LOCAL_C_INCLUDES += hardware/libhardware/include
 LOCAL_C_INCLUDES += hardware/libhardware_legacy/include
 LOCAL_C_INCLUDES += frameworks/base/include
 LOCAL_C_INCLUDES += system/core/include
-LOCAL_C_INCLUDES += system/media/audio_utils/include
 
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr

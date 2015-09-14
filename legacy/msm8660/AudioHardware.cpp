@@ -138,10 +138,10 @@ static uint32_t SND_DEVICE_VR_HEADSET                 = 71;
 static uint32_t SND_DEVICE_HAC                        = 252;
 static uint32_t SND_DEVICE_USB_HEADSET                = 253;
 #endif
-static const uint32_t DEVICE_HANDSET_RX            = 0; // handset_rx
-static const uint32_t DEVICE_HANDSET_TX            = 1;//handset_tx
+static const uint32_t DEVICE_HANDSET_RX            = 0; //handset_rx
+static const uint32_t DEVICE_HANDSET_TX            = 1; //handset_tx
 static const uint32_t DEVICE_SPEAKER_RX            = 2; //speaker_stereo_rx
-static const uint32_t DEVICE_SPEAKER_TX            = 3;//speaker_mono_tx
+static const uint32_t DEVICE_SPEAKER_TX            = 3; //speaker_mono_tx
 static const uint32_t DEVICE_HEADSET_RX            = 4; //headset_stereo_rx
 static const uint32_t DEVICE_HEADSET_TX            = 5; //headset_mono_tx
 static const uint32_t DEVICE_FMRADIO_HANDSET_RX    = 6; //fmradio_handset_rx

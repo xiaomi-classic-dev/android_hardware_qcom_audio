@@ -60,7 +60,6 @@
 
 #define DUALMIC_KEY "dualmic_enabled"
 #define BTHEADSET_VGS "bt_headset_vgs"
-#define ANC_KEY "anc_enabled"
 #define TTY_MODE_KEY "tty_mode"
 #define ECHO_SUPRESSION "ec_supported"
 
@@ -195,10 +194,6 @@ int voip_session_mute = 0;
 int voice_session_id = 0;
 int voice_session_mute = 0;
 static bool dualmic_enabled = false;
-static bool anc_running = false;
-static bool anc_setting = false;
-// This flag is used for avoiding multiple init/deinit of ANC driver.
-static bool anc_enabled = false;
 bool vMicMute = false;
 
 #ifdef QCOM_ACDB_ENABLED
@@ -432,47 +427,6 @@ bool isDeviceListEmpty() {
         return false;
 }
 
-#ifdef QCOM_ANC_HEADSET_ENABLED
-//NEEDS to be called with device already enabled
-#define ANC_ACDB_STEREO_FF_ID 26
-int enableANC(int enable, uint32_t device)
-{
-    int rc;
-    device = 16;
-    ALOGD("%s: enable=%d, device=%d", __func__, enable, device);
-
-    // If anc is already enabled/disabled, then don't initalize the driver again.
-    if (enable == anc_enabled)
-    {
-        ALOGV("ANC driver is already in state %d. Not calling anc driver", enable);
-        return -EPERM;
-    }
-
-    if (enable) {
-#ifdef QCOM_ACDB_ENABLED
-        rc = acdb_loader_send_anc_cal(ANC_ACDB_STEREO_FF_ID);
-        if (rc) {
-            ALOGE("Error processing ANC ACDB data\n");
-            return rc;
-        }
-#endif
-    }
-    rc = msm_enable_anc(DEV_ID(device),enable);
-
-    if ( rc == 0 )
-    {
-        ALOGV("msm_enable_anc was successful");
-        anc_enabled = enable;
-    } else
-    {
-        ALOGV("msm_enable_anc failed");
-
-    }
-
-    return rc;
-}
-#endif
-
 #ifdef QCOM_ACDB_ENABLED
 static void initACDB() {
     while(bInitACDB == false) {
@@ -522,10 +476,6 @@ static status_t updateDeviceInfo(int rx_device,int tx_device) {
             enableDevice(cur_tx,0);
         cur_rx = rx_device;
         cur_tx = tx_device;
-        if(cur_rx == DEVICE_ANC_HEADSET_STEREO_RX) {
-            enableDevice(cur_rx,1);
-            enableDevice(cur_tx,1);
-        }
         return NO_ERROR;
     }
 
@@ -853,10 +803,6 @@ AudioHardware::AudioHardware() :
             }
             else if((strcmp((char*)name[i],"hdmi_stereo_rx") == 0) || (strcmp((char*)name[i],"hdmi_rx") == 0)) {
                 index = DEVICE_HDMI_STERO_RX;
-            }
-            //to check for correct name and ACDB number for ANC
-            else if(strcmp((char*)name[i],"anc_headset_stereo_rx") == 0) {
-                index = DEVICE_ANC_HEADSET_STEREO_RX;
             }
             else if(strcmp((char*)name[i],"fmradio_stereo_rx") == 0)
                 index = DEVICE_FMRADIO_STEREO_RX;
@@ -1495,22 +1441,6 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
         }
         doRouting(NULL, 0);
     }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-    key = String8(ANC_KEY);
-    if (param.get(key, value) == NO_ERROR) {
-        if (value == "true") {
-          ALOGE("Enabling ANC setting in the setparameter\n");
-          anc_setting= true;
-        } else {
-           ALOGE("Disabling ANC setting in the setparameter\n");
-           anc_setting= false;
-           //disabling ANC feature.
-           enableANC(0,cur_rx);
-           anc_running = false;
-        }
-     doRouting(NULL, 0);
-    }
-#endif
 
     key = String8(TTY_MODE_KEY);
     if (param.get(key, value) == NO_ERROR) {
@@ -2137,18 +2067,6 @@ static status_t do_route_audio_rpc(uint32_t device,
         new_tx_device = cur_tx;
         ALOGI("In DEVICE_HDMI_STERO_RX and cur_tx");
     }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-    else if(device == SND_DEVICE_ANC_HEADSET) {
-        new_rx_device = DEVICE_ANC_HEADSET_STEREO_RX;
-        new_tx_device = DEVICE_HEADSET_TX;
-        ALOGI("In ANC HEADSET");
-    }
-    else if(device == SND_DEVICE_NO_MIC_ANC_HEADSET) {
-        new_rx_device = DEVICE_ANC_HEADSET_STEREO_RX;
-        new_tx_device = DEVICE_HANDSET_TX;
-        ALOGI("In ANC HEADPhone");
-    }
-#endif
 #ifdef QCOM_FM_ENABLED
     else if(device == SND_DEVICE_FM_TX){
         new_rx_device = DEVICE_FMRADIO_STEREO_RX;
@@ -2735,12 +2653,6 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
                     sndDevice = SND_DEVICE_HEADSET;
                 }
             }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-            else if (inputDevice & AUDIO_DEVICE_IN_ANC_HEADSET) {
-                    ALOGI("Routing audio to ANC Headset\n");
-                    sndDevice = SND_DEVICE_ANC_HEADSET;
-                }
-#endif
 #if defined(SAMSUNG_AUDIO) && defined(QCOM_VOIP_ENABLED)
             else if (isStreamOnAndActive(VOIP_CALL)) {
                 if (outputDevices & AUDIO_DEVICE_OUT_EARPIECE) {
@@ -2800,9 +2712,6 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
         }
         if ((mTtyMode != TTY_OFF) && (mMode == AUDIO_MODE_IN_CALL) &&
                 ((outputDevices & AUDIO_DEVICE_OUT_WIRED_HEADSET)
-#ifdef QCOM_ANC_HEADSET_ENABLED
-                 ||(outputDevices & AUDIO_DEVICE_OUT_ANC_HEADSET)
-#endif
             )) {
             if (mTtyMode == TTY_FULL) {
                 ALOGI("Routing audio to TTY FULL Mode\n");
@@ -2850,25 +2759,11 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
                 audProcess = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
             }
         }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-             else if (outputDevices & AUDIO_DEVICE_OUT_ANC_HEADPHONE) {
-                ALOGI("Routing audio to No microphone ANC Headset (%d,%x)\n", mMode, outputDevices);
-                sndDevice = SND_DEVICE_NO_MIC_ANC_HEADSET;
-                audProcess = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
-        }
-#endif
          else if (outputDevices & AUDIO_DEVICE_OUT_WIRED_HEADSET) {
              ALOGI("Routing audio to Wired Headset\n");
              sndDevice = SND_DEVICE_HEADSET;
              audProcess = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
         }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-          else if (outputDevices & AUDIO_DEVICE_OUT_ANC_HEADSET) {
-            ALOGI("Routing audio to ANC Headset\n");
-            sndDevice = SND_DEVICE_ANC_HEADSET;
-            audProcess = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
-        }
-#endif
           else if (outputDevices & AUDIO_DEVICE_OUT_SPEAKER) {
 #ifdef SAMSUNG_AUDIO
             if (mMode == AUDIO_MODE_IN_CALL) {
@@ -2984,18 +2879,6 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
         ALOGD("mCurSndDevice = %x", sndDevice);
         mCurSndDevice = sndDevice;
     }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-    //check if ANC setting is ON
-    if (anc_setting == true
-                && (sndDevice == SND_DEVICE_ANC_HEADSET
-                || sndDevice ==SND_DEVICE_NO_MIC_ANC_HEADSET)) {
-        enableANC(1,sndDevice);
-        anc_running = true;
-    } else {
-        //disconnection case
-        anc_running = false;
-    }
-#endif
     return ret;
 }
 
@@ -3547,14 +3430,8 @@ status_t AudioHardware::AudioStreamInVoip::standby()
               && !getNodeByStreamType(FM_RADIO)
 #endif /*QCOM_FM_ENABLED*/
             ) {
-#ifdef QCOM_ANC_HEADSET_ENABLED
-               if (anc_running == false) {
-#endif
                    enableDevice(temp->dev_id, 0);
                    ALOGV("Voipin: disable voip rx");
-#ifdef QCOM_ANC_HEADSET_ENABLED
-               }
-#endif
             }
             if(!getNodeByStreamType(VOICE_CALL) && !getNodeByStreamType(PCM_REC)) {
                  enableDevice(temp->dev_id_tx,0);
@@ -3885,18 +3762,11 @@ status_t AudioHardware::AudioStreamOutMSM8x60::standby()
        && !getNodeByStreamType(VOIP_CALL)
 #endif
      ) {
-#ifdef QCOM_ANC_HEADSET_ENABLED
-    //in case if ANC don't disable cur device.
-      if (anc_running == false){
-#endif
 #if 0
         if(enableDevice(cur_rx, 0)) {
             ALOGE("Disabling device failed for cur_rx %d", cur_rx);
             return 0;
         }
-#endif
-#ifdef QCOM_ANC_HEADSET_ENABLED
-      }
 #endif
     }
 
@@ -5151,15 +5021,9 @@ void AudioHardware::AudioSessionOutLPA::reset()
         && !getNodeByStreamType(VOIP_CALL)
 #endif
        ) {
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        if (anc_running == false) {
-#endif
             if (enableDevice(cur_rx, 0)) {
                 ALOGE("Disabling device failed for cur_rx %d", cur_rx);
             }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        }
-#endif
     }
     ALOGE("AudioSessionOutLPA::reset() complete");
 }
@@ -5946,16 +5810,10 @@ void AudioHardware::AudioSessionOutTunnel::reset()
         && !getNodeByStreamType(VOIP_CALL)
 #endif
        ) {
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        if (anc_running == false) {
-#endif
             if (enableDevice(cur_rx, 0)) {
                 ALOGE("AudioSessionOutTunnel::resetDisabling device failed for cur_rx %d", cur_rx);
             }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        }
-#endif
-    }
+
 
     ALOGD("AudioSessionOutTunnel::reset:dealloc buffers");
     deallocAndDeregisterbuffs();

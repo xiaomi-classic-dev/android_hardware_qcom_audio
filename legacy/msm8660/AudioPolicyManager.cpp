@@ -405,14 +405,6 @@ status_t AudioPolicyManager::setDeviceConnectionState(audio_devices_t device,
 #endif
         for (int i = mOutputs.size() -1; i >= 0; i--) {
             audio_devices_t newDevice = getNewDevice(mOutputs.keyAt(i), true /*fromCache*/);
-#ifdef QCOM_ANC_HEADSET_ENABLED
-            if(device == AUDIO_DEVICE_OUT_ANC_HEADPHONE ||
-               device == AUDIO_DEVICE_OUT_ANC_HEADSET) {
-                if(newDevice == 0){
-                    newDevice = getDeviceForStrategy(STRATEGY_MEDIA, false);
-                }
-            }
-#endif
             setOutputDevice(mOutputs.keyAt(i),
                             getNewDevice(mOutputs.keyAt(i), true /*fromCache*/),
                             true,
@@ -427,10 +419,6 @@ status_t AudioPolicyManager::setDeviceConnectionState(audio_devices_t device,
             device = AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET;
         } else if(device == AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET){
             device = AUDIO_DEVICE_IN_ANLG_DOCK_HEADSET;
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        } else if(device == AUDIO_DEVICE_OUT_ANC_HEADSET){
-               device = AUDIO_DEVICE_IN_ANC_HEADSET; //wait for actual ANC device
-#endif
         } else {
             return NO_ERROR;
         }
@@ -1568,12 +1556,6 @@ audio_devices_t AudioPolicyManager::getDeviceForStrategy(routing_strategy strate
             if (device) break;
             device = mAvailableOutputDevices & AUDIO_DEVICE_OUT_WIRED_HEADSET;
             if (device) break;
-#ifdef QCOM_ANC_HEADSET_ENABLED
-            device = mAvailableOutputDevices & AUDIO_DEVICE_OUT_ANC_HEADPHONE;
-            if (device) break;
-            device = mAvailableOutputDevices & AUDIO_DEVICE_OUT_ANC_HEADSET;
-            if (device) break;
-#endif
             if (mPhoneState != AudioSystem::MODE_IN_CALL) {
                 device = mAvailableOutputDevices & AUDIO_DEVICE_OUT_USB_ACCESSORY;
                 if (device) break;
@@ -1692,14 +1674,6 @@ audio_devices_t AudioPolicyManager::getDeviceForStrategy(routing_strategy strate
             if (device2 == AUDIO_DEVICE_NONE) {
                 device2 = mAvailableOutputDevices & AUDIO_DEVICE_OUT_WIRED_HEADSET;
             }
-#ifdef QCOM_ANC_HEADSET_ENABLED
-            if (device2 == AUDIO_DEVICE_NONE) {
-                device2 = mAvailableOutputDevices & AUDIO_DEVICE_OUT_ANC_HEADPHONE;
-            }
-            if (device2 == AUDIO_DEVICE_NONE) {
-                device2 = mAvailableOutputDevices & AUDIO_DEVICE_OUT_ANC_HEADSET;
-            }
-#endif
             if (device2 == AUDIO_DEVICE_NONE) {
                 device2 = mAvailableOutputDevices & AUDIO_DEVICE_OUT_USB_ACCESSORY;
             }
@@ -1837,10 +1811,6 @@ audio_devices_t AudioPolicyManager::getDeviceForInputSource(int inputSource)
             device = AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET;
         } else if (mAvailableInputDevices & AUDIO_DEVICE_IN_WIRED_HEADSET) {
             device = AUDIO_DEVICE_IN_WIRED_HEADSET;
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        } else if (mAvailableInputDevices & AUDIO_DEVICE_IN_ANC_HEADSET) {
-            device = AUDIO_DEVICE_IN_ANC_HEADSET;
-#endif
         } else if (mAvailableInputDevices & AUDIO_DEVICE_IN_ANLG_DOCK_HEADSET) {
             device = AUDIO_DEVICE_IN_ANLG_DOCK_HEADSET;
         } else if (mAvailableInputDevices & AUDIO_DEVICE_IN_BUILTIN_MIC) {
@@ -1932,10 +1902,6 @@ AudioPolicyManager::device_category AudioPolicyManager::getDeviceCategory(audio_
             return DEVICE_CATEGORY_EARPIECE;
         case AUDIO_DEVICE_OUT_WIRED_HEADSET:
         case AUDIO_DEVICE_OUT_WIRED_HEADPHONE:
-#ifdef QCOM_ANC_HEADSET_ENABLED
-        case AUDIO_DEVICE_OUT_ANC_HEADSET:
-        case AUDIO_DEVICE_OUT_ANC_HEADPHONE:
-#endif
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
         case AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET:
         case AUDIO_DEVICE_OUT_BLUETOOTH_A2DP:

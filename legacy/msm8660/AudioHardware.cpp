@@ -2665,12 +2665,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
                 }
             }
 #endif
-            else if (isStreamOnAndActive(PCM_PLAY)
-#ifdef QCOM_TUNNEL_LPA_ENABLED
-                     || isStreamOnAndActive(LPA_DECODE)
-#endif
-              ) {
-                if (outputDevices & AUDIO_DEVICE_OUT_EARPIECE) {
+                else if (outputDevices & AUDIO_DEVICE_OUT_EARPIECE) {
                     ALOGI("Routing audio to Handset\n");
                     sndDevice = SND_DEVICE_HANDSET;
                 } else if (outputDevices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE) {
@@ -2699,7 +2694,6 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
                     sndDevice = SND_DEVICE_VR_HEADSET;
             }
 #endif
-        }
         // if inputDevice == 0, restore output routing
     }
 

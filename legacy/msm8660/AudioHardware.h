@@ -339,6 +339,7 @@ private:
     };
 #endif
 
+#ifdef QCOM_TUNNEL_LPA_ENABLED
 class AudioSessionOutLPA : public AudioStreamOut
 {
 public:
@@ -480,6 +481,7 @@ private:
 	int afd;
 	int ionfd;
 };
+#endif
 
 #ifdef TUNNEL_PLAYBACK
 class AudioSessionOutTunnel : public AudioStreamOut

@@ -544,7 +544,7 @@ static status_t updateDeviceInfo(int rx_device,int tx_device) {
                 tx_dev_prev = cur_tx;
                 cur_tx = tx_device ;
                 cur_rx = rx_device ;
-                if((vMicMute == true) && (tx_dev_prev != tx_device)) {
+                if((vMicMute == true) && (tx_dev_prev != cur_tx)) {
                     ALOGD("REC:device switch with mute enabled :tx_dev_prev %d cur_tx: %d",tx_dev_prev, cur_tx);
                     msm_device_mute(DEV_ID(cur_tx), true);
                 }
@@ -1109,14 +1109,23 @@ void AudioHardware::closeOutputStream(AudioStreamOut* out) {
 #ifdef QCOM_VOIP_ENABLED
         && mDirectOutput == 0
 #endif
-        && mOutputLPA == 0) || ((mOutput != out)
+#ifdef QCOM_TUNNEL_LPA_ENABLED
+        && mOutputLPA == 0
+#endif
+        ) || ((mOutput != out)
 #ifdef QCOM_VOIP_ENABLED
          && (mDirectOutput != out)
 #endif
 #ifdef TUNNEL_PLAYBACK
         && (mOutputTunnel!= out)
 #endif /*TUNNEL_PLAYBACK*/
-       && (mOutputLPA != out))) {
+#ifdef QCOM_TUNNEL_LPA_ENABLED
+       && (mOutputLPA != out))
+#else
+       )
+#endif
+       )
+    {
         ALOGW("Attempt to close invalid output stream");
     }
     else if (mOutput == out) {
@@ -1133,11 +1142,13 @@ void AudioHardware::closeOutputStream(AudioStreamOut* out) {
         }
     }
 #endif
+#ifdef QCOM_TUNNEL_LPA_ENABLED
     else if (mOutputLPA == out) {
         ALOGV(" deleting  mOutputLPA \n");
         delete mOutputLPA;
         mOutputLPA = 0;
     }
+#endif
 #ifdef TUNNEL_PLAYBACK
     else if (mOutputTunnel == out) {
         ALOGD("Closing Tunnel Output");
@@ -1570,6 +1581,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
 #endif /*QCOM_FM_ENABLED*/
 
     return NO_ERROR;
+
 }
 #ifdef QCOM_VOIP_ENABLED
 
@@ -1601,8 +1613,7 @@ uint32_t AudioHardware::getMvsMode(int format, int rate)
         return MVS_MODE_4GV_WB;
         break;
     default:
-        return UNKNOWN_ERROR;
-        break;
+        return BAD_INDEX;
     }
 }
 
@@ -1873,33 +1884,6 @@ status_t AudioHardware::setVoiceVolume(float v)
     ALOGV("msm_set_voice_rx_vol(%d) succeeded session_id %d",vol,session_id);
     return NO_ERROR;
 }
-
-#ifdef QCOM_FM_ENABLED
-status_t AudioHardware::setFmVolume(float v)
-{
-    int vol = android::AudioSystem::logToLinear( (v?(v + 0.005):v) );
-    if ( vol > 100 ) {
-        vol = 100;
-    }
-    else if ( vol < 0 ) {
-        vol = 0;
-    }
-    ALOGV("setFmVolume(%f)\n", v);
-    ALOGV("Setting FM volume to %d (available range is 0 to 100)\n", vol);
-    Routing_table* temp = NULL;
-    temp = getNodeByStreamType(FM_RADIO);
-    if(temp == NULL){
-        ALOGV("No Active FM stream is running");
-        return NO_ERROR;
-    }
-    if(msm_set_volume(temp->dec_id, vol)) {
-        ALOGE("msm_set_volume(%d) failed for FM errno = %d",vol,errno);
-        return -1;
-    }
-    ALOGV("msm_set_volume(%d) for FM succeeded",vol);
-    return NO_ERROR;
-}
-#endif
 
 status_t AudioHardware::setMasterVolume(float v)
 {
@@ -3154,7 +3138,7 @@ status_t AudioHardware::AudioStreamInVoip::set(
 
     mHardware = hw;
 
-    if ((pFormat == 0) || (UNKNOWN_ERROR == hw->getMvsMode(*pFormat, *pRate))) {
+    if ((pFormat == 0) || BAD_INDEX == hw->getMvsMode(*pFormat, *pRate)) {
         ALOGE("Audio Format (%x) not supported \n",*pFormat);
         return BAD_VALUE;
     }
@@ -3490,7 +3474,7 @@ status_t AudioHardware::AudioStreamInVoip::setParameters(const String8& keyValue
             status = BAD_VALUE;
         } else {
             mDevices = device;
-            status = mHardware->doRouting(this, 0);
+            status = mHardware->doRouting(this, device);
         }
         param.remove(key);
     }
@@ -3827,6 +3811,7 @@ status_t AudioHardware::AudioStreamOutMSM8x60::setParameters(const String8& keyV
         param.remove(key);
     }
 
+#ifdef QCOM_FM_ENABLED
     key = String8(AUDIO_PARAMETER_KEY_HANDLE_FM);
     ALOGI("checking Handle FM");
     if (param.getInt(key, device) == NO_ERROR) {
@@ -3834,8 +3819,7 @@ status_t AudioHardware::AudioStreamOutMSM8x60::setParameters(const String8& keyV
         mHardware->handleFm(device);
         param.remove(key);
     }
-
-
+#endif
 
     if (param.size()) {
         status = BAD_VALUE;
@@ -5035,6 +5019,7 @@ status_t AudioHardware::AudioSessionOutLPA::getPresentationPosition(uint64_t *fr
     return INVALID_OPERATION;
 }
 
+#ifdef QCOM_TUNNEL_LPA_ENABLED
 status_t AudioHardware::AudioSessionOutLPA::getBufferInfo(buf_info **buf) {
 
     buf_info *tempbuf = (buf_info *)malloc(sizeof(buf_info) + mInputBufferCount*sizeof(int *));
@@ -5050,6 +5035,7 @@ status_t AudioHardware::AudioSessionOutLPA::getBufferInfo(buf_info **buf) {
     *buf = tempbuf;
     return NO_ERROR;
 }
+#endif
 
 status_t AudioHardware::AudioSessionOutLPA::isBufferAvailable(int *isAvail) {
 

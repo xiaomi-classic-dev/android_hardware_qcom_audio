@@ -1,6 +1,13 @@
-AUDIO_HW_ROOT := $(call my-dir)
+ifeq ($(call my-dir),$(call project-path-for,qcom-audio))
 
-ifeq ($(TARGET_BOARD_PLATFORM),msm8660)
-    include $(AUDIO_HW_ROOT)/msm8660/Android.mk
-    include $(AUDIO_HW_ROOT)/mm-audio/Android.mk
+ifneq ($(filter msm8660,$(TARGET_BOARD_PLATFORM)),)
+
+MY_LOCAL_PATH := $(call my-dir)
+
+ifeq ($(BOARD_USES_LEGACY_ALSA_AUDIO),true)
+include $(MY_LOCAL_PATH)/legacy/Android.mk
+endif
+
+endif
+
 endif

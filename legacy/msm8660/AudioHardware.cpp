@@ -2350,8 +2350,8 @@ status_t AudioHardware::doRouting(AudioStreamInMSM8x60 *input, uint32_t outputDe
         ) {
             ALOGV("Ignoring routing for FM/INCALL/VOIP recording");
             return NO_ERROR;
-	}
-        if (inputDevice != 0) {
+        }
+        if (inputDevice & AUDIO_DEVICE_BIT_IN) {
             if (inputDevice & AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET) {
                 ALOGI("Routing audio to Bluetooth PCM\n");
                 sndDevice = SND_DEVICE_BT;

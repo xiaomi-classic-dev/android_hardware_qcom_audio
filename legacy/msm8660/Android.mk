@@ -109,6 +109,7 @@ LOCAL_C_INCLUDES += hardware/libhardware_legacy/audio
 LOCAL_CFLAGS += $(common_cflags) -Wno-error
 
 include $(BUILD_SHARED_LIBRARY)
+endif
 
 # Load audio_policy.conf to system/etc/
 include $(CLEAR_VARS)

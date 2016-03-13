@@ -122,6 +122,10 @@ enum tty_modes {
 #define AUDIO_HW_IN_CHANNELS (AUDIO_CHANNEL_IN_MONO) // Default audio input channel mask
 #define AUDIO_HW_IN_BUFFERSIZE 480 * 4                 // Default audio input buffer size
 #define AUDIO_HW_IN_FORMAT (AUDIO_FORMAT_PCM_16_BIT)  // Default audio input sample format
+#ifdef QCOM_FM_ENABLED
+#define AUDIO_PARAMETER_KEY_FM_VOLUME "fm_volume"
+#define AUDIO_DEVICE_OUT_FM_TX  0x10000
+#endif
 
 class AudioHardware : public  AudioHardwareBase
 {

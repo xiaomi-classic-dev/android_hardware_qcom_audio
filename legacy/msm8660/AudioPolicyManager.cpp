@@ -1848,10 +1848,7 @@ audio_devices_t AudioPolicyManager::getDeviceForInputSource(int inputSource)
         break;
 #ifdef QCOM_FM_ENABLED
    case AUDIO_SOURCE_FM_RX:
-        device = AUDIO_DEVICE_IN_FM_RX;
-        break;
-    case AUDIO_SOURCE_FM_RX_A2DP:
-        device = AUDIO_DEVICE_IN_FM_RX_A2DP;
+        device = AUDIO_DEVICE_IN_FM_TUNER;
         break;
 #endif
     default:

@@ -124,7 +124,6 @@ enum tty_modes {
 #define AUDIO_HW_IN_FORMAT (AUDIO_FORMAT_PCM_16_BIT)  // Default audio input sample format
 #ifdef QCOM_FM_ENABLED
 #define AUDIO_PARAMETER_KEY_FM_VOLUME "fm_volume"
-#define AUDIO_DEVICE_OUT_FM_TX  0x10000
 #endif
 
 class AudioHardware : public  AudioHardwareBase
@@ -225,7 +224,6 @@ private:
     status_t    enableFM(int sndDevice);
     status_t    setFmVolume(float fm_volume);
 #endif
-    status_t    enableComboDevice(uint32_t sndDevice, bool enableOrDisable);
 #ifdef QCOM_FM_ENABLED
     status_t    disableFM();
 #endif

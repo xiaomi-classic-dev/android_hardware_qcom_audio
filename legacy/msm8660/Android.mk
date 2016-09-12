@@ -51,6 +51,10 @@ $(shell mkdir -p $(OUT)/obj/SHARED_LIBRARIES/libacdbloader_intermediates/)
 $(shell touch $(OUT)/obj/SHARED_LIBRARIES/libacdbloader_intermediates/export_includes)
 $(shell mkdir -p $(OUT)/obj/SHARED_LIBRARIES/libacdbmapper_intermediates/)
 $(shell touch $(OUT)/obj/SHARED_LIBRARIES/libacdbmapper_intermediates/export_includes)
+$(shell mkdir -p $(OUT)/obj/lib)
+$(shell touch $(OUT)/obj/lib/libaudioalsa.so.toc)
+$(shell touch $(OUT)/obj/lib/libacdbloader.so.toc)
+$(shell touch $(OUT)/obj/lib/libacdbmapper.so.toc)
 
 ifneq ($(TARGET_SIMULATOR),true)
 LOCAL_SHARED_LIBRARIES += libdl

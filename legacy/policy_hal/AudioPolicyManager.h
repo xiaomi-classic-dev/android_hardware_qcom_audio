@@ -61,7 +61,7 @@ protected:
                 audio_format_t format,
                 audio_channel_mask_t channelMask,
                 audio_input_flags_t flags,
-                AudioMix *policyMix);
+                AudioPolicyMix *policyMix);
 
         // check that volume change is permitted, compute and send new volume to audio hardware
         virtual status_t checkAndSetVolume(audio_stream_type_t stream, int index,

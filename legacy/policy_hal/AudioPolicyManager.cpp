@@ -688,7 +688,7 @@ audio_io_handle_t AudioPolicyManagerCustom::getInputForDevice(audio_devices_t de
                                                         audio_format_t format,
                                                         audio_channel_mask_t channelMask,
                                                         audio_input_flags_t flags,
-                                                        AudioMix *policyMix)
+                                                        AudioPolicyMix *policyMix)
 {
     audio_io_handle_t input = AUDIO_IO_HANDLE_NONE;
     audio_source_t halInputSource = inputSource;

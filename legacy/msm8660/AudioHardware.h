@@ -136,7 +136,9 @@ enum tty_modes {
 class AudioHardware : public  AudioHardwareBase
 {
     class AudioStreamOutMSM8x60;
+#ifdef QCOM_TUNNEL_LPA_ENABLED
     class AudioSessionOutLPA;
+#endif
     class AudioStreamInMSM8x60;
 #ifdef QCOM_VOIP_ENABLED
     class AudioStreamOutDirect;
@@ -740,7 +742,9 @@ private:
 #ifdef QCOM_VOIP_ENABLED
             AudioStreamOutDirect*  mDirectOutput;
 #endif
+#ifdef QCOM_TUNNEL_LPA_ENABLED
             AudioSessionOutLPA* mOutputLPA;
+#endif
 #ifdef TUNNEL_PLAYBACK
             AudioSessionOutTunnel* mOutputTunnel;
 #endif /*TUNNEL_PLAYBACK*/

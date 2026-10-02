@@ -175,8 +175,8 @@ static uint32_t DEVICE_HEADSET_VR_TX         = 83; // headset_vr_tx
 static uint32_t DEVICE_CAMCORDER_TX          = 105; // camcoder_tx (misspelled by Samsung)
                                                     // secondary_mic_tx (sony)
 
-static uint32_t FLUENCE_MODE_ENDFIRE   = 0;
-static uint32_t FLUENCE_MODE_BROADSIDE = 1;
+static const int FLUENCE_MODE_ENDFIRE   = 0;
+static const int FLUENCE_MODE_BROADSIDE = 1;
 static int vr_enable = 0;
 
 int dev_cnt = 0;
@@ -544,7 +544,7 @@ static status_t updateDeviceInfo(int rx_device,int tx_device) {
                 tx_dev_prev = cur_tx;
                 cur_tx = tx_device ;
                 cur_rx = rx_device ;
-                if((vMicMute == true) && (tx_dev_prev != cur_tx)) {
+                if((vMicMute == true) && (static_cast<uint32_t>(tx_dev_prev) != cur_tx)) {
                     ALOGD("REC:device switch with mute enabled :tx_dev_prev %d cur_tx: %d",tx_dev_prev, cur_tx);
                     msm_device_mute(DEV_ID(cur_tx), true);
                 }
@@ -1477,7 +1477,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
 }
 #ifdef QCOM_VOIP_ENABLED
 
-uint32_t AudioHardware::getMvsMode(int format, int rate)
+int AudioHardware::getMvsMode(int format, int rate)
 {
     switch(format) {
     case AUDIO_FORMAT_PCM_16_BIT:

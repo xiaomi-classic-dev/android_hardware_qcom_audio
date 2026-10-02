@@ -1110,14 +1110,20 @@ void AudioHardware::closeOutputStream(AudioStreamOut* out) {
 #ifdef QCOM_VOIP_ENABLED
         && mDirectOutput == 0
 #endif
-        && mOutputLPA == 0) || ((mOutput != out)
+#ifdef QCOM_TUNNEL_LPA_ENABLED
+        && mOutputLPA == 0
+#endif
+        ) || ((mOutput != out)
 #ifdef QCOM_VOIP_ENABLED
          && (mDirectOutput != out)
 #endif
 #ifdef TUNNEL_PLAYBACK
         && (mOutputTunnel!= out)
 #endif /*TUNNEL_PLAYBACK*/
-       && (mOutputLPA != out))) {
+#ifdef QCOM_TUNNEL_LPA_ENABLED
+       && (mOutputLPA != out)
+#endif
+       )) {
         ALOGW("Attempt to close invalid output stream");
     }
     else if (mOutput == out) {
@@ -1134,11 +1140,13 @@ void AudioHardware::closeOutputStream(AudioStreamOut* out) {
         }
     }
 #endif
+#ifdef QCOM_TUNNEL_LPA_ENABLED
     else if (mOutputLPA == out) {
         ALOGV(" deleting  mOutputLPA \n");
         delete mOutputLPA;
         mOutputLPA = 0;
     }
+#endif
 #ifdef TUNNEL_PLAYBACK
     else if (mOutputTunnel == out) {
         ALOGD("Closing Tunnel Output");

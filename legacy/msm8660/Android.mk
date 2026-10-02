@@ -84,5 +84,7 @@ LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 LOCAL_CFLAGS += $(common_cflags)
+# CM12.1 public audio/Mutex headers trigger these diagnostics with GCC 4.8.
+LOCAL_CFLAGS += -Wno-error=missing-field-initializers -Wno-error=narrowing
 
 include $(BUILD_SHARED_LIBRARY)

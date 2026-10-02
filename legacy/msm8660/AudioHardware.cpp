@@ -1015,8 +1015,9 @@ AudioStreamOut* AudioHardware::openOutputStream(
         if (mOutput && !((flags & AUDIO_OUTPUT_FLAG_DIRECT) && (flags & AUDIO_OUTPUT_FLAG_VOIP_RX))
 #ifdef QCOM_TUNNEL_LPA_ENABLED
                     && !(flags & AUDIO_OUTPUT_FLAG_TUNNEL)
+                    && !(flags & AUDIO_OUTPUT_FLAG_LPA)
 #endif /* QCOM_TUNNEL_LPA_ENABLED */
-                    && !(flags & AUDIO_OUTPUT_FLAG_LPA)) {
+                    ) {
 
             if (status) {
                 *status = INVALID_OPERATION;

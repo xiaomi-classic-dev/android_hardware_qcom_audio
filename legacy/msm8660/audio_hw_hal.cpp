@@ -632,10 +632,12 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
     devices = convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
     status = static_cast<audio_output_flags_t> (flags);
 
-    out->qcom_out = qadev->hwif->openOutputStream(devices, (int *) &config->format,
+    int format = static_cast<int>(config->format);
+    out->qcom_out = qadev->hwif->openOutputStream(devices, &format,
                                                     &config->channel_mask,
                                                     &config->sample_rate,
                                                     &status);
+    config->format = static_cast<audio_format_t>(format);
     if (!out->qcom_out) {
         ret = status;
         goto err_open;
@@ -705,11 +707,13 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
 
     devices = convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
 
-    in->qcom_in = qadev->hwif->openInputStream(devices, (int *)&config->format,
+    int format = static_cast<int>(config->format);
+    in->qcom_in = qadev->hwif->openInputStream(devices, &format,
                                     &config->channel_mask,
                                     &config->sample_rate,
                                     &status,
                                     (AudioSystem::audio_in_acoustics)0);
+    config->format = static_cast<audio_format_t>(format);
     if (!in->qcom_in) {
         ret = status;
         goto err_open;

@@ -205,7 +205,7 @@ public:
 
 protected:
     virtual status_t    dump(int fd, const Vector<String16>& args);
-    uint32_t getMvsMode(int format, int rate);
+    int getMvsMode(int format, int rate);
     uint32_t getMvsRateType(uint32_t MvsMode, uint32_t *rateType);
     status_t setupDeviceforVoipCall(bool value);
 

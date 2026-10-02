@@ -43,6 +43,7 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_ARM_MODE := arm
+LOCAL_CLANG := false
 LOCAL_CFLAGS := -D_POSIX_SOURCE
 
 LOCAL_SRC_FILES := \
@@ -86,5 +87,6 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 LOCAL_CFLAGS += $(common_cflags)
 # CM12.1 public audio/Mutex headers trigger these diagnostics with GCC 4.8.
 LOCAL_CFLAGS += -Wno-error=missing-field-initializers -Wno-error=narrowing
+LOCAL_CFLAGS += -Wno-error=unused-parameter -Wno-error=unused-variable
 
 include $(BUILD_SHARED_LIBRARY)

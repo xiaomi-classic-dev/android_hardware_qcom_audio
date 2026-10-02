@@ -76,10 +76,6 @@ static uint32_t audio_device_conv_table[][HAL_API_REV_NUM] =
     { AudioSystem::DEVICE_OUT_ANLG_DOCK_HEADSET, AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET },
     { AudioSystem::DEVICE_OUT_DGTL_DOCK_HEADSET, AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET },
     { AudioSystem::DEVICE_OUT_DEFAULT, AUDIO_DEVICE_OUT_DEFAULT },
-#ifdef QCOM_ANC_HEADSET_ENABLED
-    { AudioSystem::DEVICE_OUT_ANC_HEADSET, AUDIO_DEVICE_OUT_ANC_HEADSET },
-    { AudioSystem::DEVICE_OUT_ANC_HEADPHONE, AUDIO_DEVICE_OUT_ANC_HEADPHONE },
-#endif
 #ifdef QCOM_FM_ENABLED
     { AudioSystem::DEVICE_OUT_FM, AUDIO_DEVICE_OUT_FM },
 #endif
@@ -99,9 +95,6 @@ static uint32_t audio_device_conv_table[][HAL_API_REV_NUM] =
     { AudioSystem::DEVICE_IN_VOICE_CALL, AUDIO_DEVICE_IN_VOICE_CALL },
     { AudioSystem::DEVICE_IN_BACK_MIC, AUDIO_DEVICE_IN_BACK_MIC },
     { AudioSystem::DEVICE_IN_DEFAULT, AUDIO_DEVICE_IN_DEFAULT },
-#ifdef QCOM_ANC_HEADSET_ENABLED
-    { AudioSystem::DEVICE_IN_ANC_HEADSET, AUDIO_DEVICE_IN_ANC_HEADSET },
-#endif
 #ifdef QCOM_FM_ENABLED
     { AudioSystem::DEVICE_IN_FM_RX, AUDIO_DEVICE_IN_FM_RX },
     { AudioSystem::DEVICE_IN_FM_RX_A2DP, AUDIO_DEVICE_IN_FM_RX_A2DP },
@@ -142,7 +135,7 @@ static uint32_t out_get_sample_rate(const struct audio_stream *stream)
     return out->qcom_out->sampleRate();
 }
 
-static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate __unused)
 {
     struct qcom_stream_out *out =
         reinterpret_cast<struct qcom_stream_out *>(stream);
@@ -163,7 +156,7 @@ static audio_channel_mask_t out_get_channels(const struct audio_stream *stream)
 {
     const struct qcom_stream_out *out =
         reinterpret_cast<const struct qcom_stream_out *>(stream);
-    return (audio_channel_mask_t) out->qcom_out->channels();
+    return out->qcom_out->channels();
 }
 
 static audio_format_t out_get_format(const struct audio_stream *stream)
@@ -173,7 +166,7 @@ static audio_format_t out_get_format(const struct audio_stream *stream)
     return (audio_format_t)out->qcom_out->format();
 }
 
-static int out_set_format(struct audio_stream *stream, audio_format_t format)
+static int out_set_format(struct audio_stream *stream, audio_format_t format __unused)
 {
     struct qcom_stream_out *out =
         reinterpret_cast<struct qcom_stream_out *>(stream);
@@ -319,12 +312,12 @@ static status_t out_stop(struct audio_stream_out *stream)
     return out->qcom_out->stop();
 }
 
-static int out_add_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
+static int out_add_audio_effect(const struct audio_stream *stream __unused, effect_handle_t effect __unused)
 {
     return 0;
 }
 
-static int out_remove_audio_effect(const struct audio_stream *stream, effect_handle_t effect)
+static int out_remove_audio_effect(const struct audio_stream *stream __unused, effect_handle_t effect __unused)
 {
     return 0;
 }
@@ -337,6 +330,14 @@ static int out_get_next_write_timestamp(const struct audio_stream_out *stream,
     return out->qcom_out->getNextWriteTimestamp(timestamp);
 }
 
+static int out_get_presentation_position(const struct audio_stream_out *stream,
+    uint64_t *frames, struct timespec *timestamp)
+{
+    const struct qcom_stream_out *out =
+        reinterpret_cast<const struct qcom_stream_out *>(stream);
+    return out->qcom_out->getPresentationPosition(frames, timestamp);
+}
+
 /** audio_stream_in implementation **/
 static uint32_t in_get_sample_rate(const struct audio_stream *stream)
 {
@@ -345,7 +346,7 @@ static uint32_t in_get_sample_rate(const struct audio_stream *stream)
     return in->qcom_in->sampleRate();
 }
 
-static int in_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+static int in_set_sample_rate(struct audio_stream *stream, uint32_t rate __unused)
 {
     struct qcom_stream_in *in =
         reinterpret_cast<struct qcom_stream_in *>(stream);
@@ -366,7 +367,7 @@ static audio_channel_mask_t in_get_channels(const struct audio_stream *stream)
 {
     const struct qcom_stream_in *in =
         reinterpret_cast<const struct qcom_stream_in *>(stream);
-    return (audio_channel_mask_t) in->qcom_in->channels();
+    return in->qcom_in->channels();
 }
 
 static audio_format_t in_get_format(const struct audio_stream *stream)
@@ -376,7 +377,7 @@ static audio_format_t in_get_format(const struct audio_stream *stream)
     return (audio_format_t)in->qcom_in->format();
 }
 
-static int in_set_format(struct audio_stream *stream, audio_format_t format)
+static int in_set_format(struct audio_stream *stream, audio_format_t format __unused)
 {
     struct qcom_stream_in *in =
         reinterpret_cast<struct qcom_stream_in *>(stream);
@@ -509,10 +510,6 @@ static uint32_t adev_get_supported_devices(const struct audio_hw_device *dev)
             AUDIO_DEVICE_OUT_USB_ACCESSORY |
             AUDIO_DEVICE_OUT_USB_DEVICE |
             AUDIO_DEVICE_OUT_REMOTE_SUBMIX |
-#ifdef QCOM_ANC_HEADSET_ENABLED
-            AUDIO_DEVICE_OUT_ANC_HEADSET |
-            AUDIO_DEVICE_OUT_ANC_HEADPHONE |
-#endif
 #ifdef QCOM_FM_ENABLED
             AUDIO_DEVICE_OUT_FM |
             AUDIO_DEVICE_OUT_FM_TX |
@@ -532,9 +529,6 @@ static uint32_t adev_get_supported_devices(const struct audio_hw_device *dev)
             AUDIO_DEVICE_IN_DGTL_DOCK_HEADSET |
             AUDIO_DEVICE_IN_USB_ACCESSORY |
             AUDIO_DEVICE_IN_USB_DEVICE |
-#ifdef QCOM_ANC_HEADSET_ENABLED
-            AUDIO_DEVICE_IN_ANC_HEADSET |
-#endif
 #ifdef QCOM_FM_ENABLED
             AUDIO_DEVICE_IN_FM_RX |
             AUDIO_DEVICE_IN_FM_RX_A2DP |
@@ -578,7 +572,7 @@ static int adev_set_fm_volume(struct audio_hw_device *dev, float volume)
 static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
 {
     struct qcom_audio_device *qadev = to_ladev(dev);
-    return qadev->hwif->setMode((int)mode);
+    return qadev->hwif->setMode(mode);
 }
 
 static int adev_set_mic_mute(struct audio_hw_device *dev, bool state)
@@ -617,13 +611,14 @@ static size_t adev_get_input_buffer_size(const struct audio_hw_device *dev,
     return qadev->hwif->getInputBufferSize(config->sample_rate,config->format,channelCount);
 }
 
-
 static int adev_open_output_stream(struct audio_hw_device *dev,
-                                   audio_io_handle_t handle,
+                                   audio_io_handle_t handle __unused,
                                    audio_devices_t devices,
                                    audio_output_flags_t flags,
                                    struct audio_config *config,
-                                   struct audio_stream_out **stream_out)
+                                   struct audio_stream_out **stream_out,
+                                   const char * address __unused)
+
 {
     struct qcom_audio_device *qadev = to_ladev(dev);
     status_t status;
@@ -692,10 +687,12 @@ static void adev_close_output_stream(struct audio_hw_device *dev,
 
 /** This method creates and opens the audio hardware input stream */
 static int adev_open_input_stream(struct audio_hw_device *dev,
-                                  audio_io_handle_t handle,
+                                  audio_io_handle_t handle __unused,
                                   audio_devices_t devices,
-                                  struct audio_config *config,
-                                  struct audio_stream_in **stream_in)
+                                  audio_config *config,
+                                  audio_stream_in **stream_in, audio_input_flags_t flags __unused,
+                                  const char * address __unused,
+                                  audio_source_t source __unused)
 {
     struct qcom_audio_device *qadev = to_ladev(dev);
     status_t status;

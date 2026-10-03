@@ -64,8 +64,7 @@ endif
 
 LOCAL_STATIC_LIBRARIES := \
     libmedia_helper \
-    libaudiohw_legacy \
-    libaudiopolicy_legacy \
+    libaudiohw_legacy
 
 LOCAL_MODULE := audio.primary.msm8660
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw

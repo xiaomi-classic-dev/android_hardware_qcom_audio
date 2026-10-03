@@ -29,6 +29,12 @@
 
 namespace android_audio_legacy {
 
+// Oreo's legacy interface declares this default without defining it.
+// Keep the fallback in the device HAL; hardware-specific streams override it.
+status_t AudioStreamOut::getPresentationPosition(uint64_t*, struct timespec*) {
+    return INVALID_OPERATION;
+}
+
 extern "C" {
 
 struct qcom_audio_module {

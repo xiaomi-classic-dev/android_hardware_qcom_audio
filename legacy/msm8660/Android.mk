@@ -68,7 +68,8 @@ LOCAL_STATIC_LIBRARIES := \
     libaudiohw_legacy
 
 LOCAL_MODULE := audio.primary.msm8660
-LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+LOCAL_VENDOR_MODULE := true
+LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_CFLAGS += -fno-short-enums

@@ -27,6 +27,7 @@ libOmxQcelp13Enc-inc       := $(LOCAL_PATH)/inc
 libOmxQcelp13Enc-inc       += $(TARGET_OUT_HEADERS)/mm-core/omxcore
 
 LOCAL_MODULE            := libOmxQcelp13Enc
+LOCAL_VENDOR_MODULE := true
 LOCAL_MODULE_TAGS       := optional
 LOCAL_CFLAGS            := $(libOmxQcelp13Enc-def)
 LOCAL_C_INCLUDES        := $(libOmxQcelp13Enc-inc)

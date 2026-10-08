@@ -2525,7 +2525,8 @@ OMX_ERRORTYPE  omx_aac_aenc::get_parameter(OMX_IN OMX_HANDLETYPE     hComp,
         return OMX_ErrorBadParameter;
     }
 
-    switch (paramIndex)
+    // QCOM extension indices are outside the standard OMX_INDEXTYPE enum.
+    switch (static_cast<OMX_U32>(paramIndex))
     {
         case OMX_IndexParamPortDefinition:
             {
@@ -2951,8 +2952,7 @@ OMX_ERRORTYPE  omx_aac_aenc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
 				bufferSupplierType->eBufferSupplier;
                 } else
                 {
-                    DEBUG_PRINT_ERROR("set_param:IndexParamCompBufferSup \ 
-					%08x\n", eRet);
+                    DEBUG_PRINT_ERROR("set_param:IndexParamCompBufferSup %08x\n", eRet);
                     eRet = OMX_ErrorBadPortIndex;
                 }
 

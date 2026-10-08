@@ -2440,7 +2440,8 @@ OMX_ERRORTYPE  omx_qcelp13_aenc::get_parameter(OMX_IN OMX_HANDLETYPE     hComp,
         return OMX_ErrorBadParameter;
     }
 
-    switch (paramIndex)
+    // QCOM extension indices are outside the standard OMX_INDEXTYPE enum.
+    switch (static_cast<OMX_U32>(paramIndex))
     {
         case OMX_IndexParamPortDefinition:
             {

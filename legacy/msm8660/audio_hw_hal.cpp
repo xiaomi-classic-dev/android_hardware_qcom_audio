@@ -44,7 +44,7 @@ struct qcom_audio_module {
 struct qcom_audio_device {
     struct audio_hw_device device;
 
-    struct AudioHardwareInterface *hwif;
+    AudioHardwareInterface *hwif;
 };
 
 struct qcom_stream_out {
@@ -339,7 +339,7 @@ static int out_get_next_write_timestamp(const struct audio_stream_out *stream __
     return out->qcom_out->getNextWriteTimestamp(timestamp);
 }
 
-static int out_get_presentation_position(const struct audio_stream_out *stream,
+static int __unused out_get_presentation_position(const struct audio_stream_out *stream,
     uint64_t *frames, struct timespec *timestamp)
 {
     const struct qcom_stream_out *out =

@@ -675,7 +675,7 @@ private:
                 AudioSystem::audio_in_acoustics mAcoustics;
                 uint32_t    mDevices;
                 bool        mFirstread;
-                uint32_t    mFmRec;
+                uint32_t    mFmRec __unused;
                 int         mForVR;
     };
 #ifdef QCOM_VOIP_ENABLED
@@ -723,7 +723,7 @@ private:
                 AudioSystem::audio_in_acoustics mAcoustics;
                 uint32_t    mDevices;
                 bool        mFirstread;
-                uint32_t    mFmRec;
+                uint32_t    mFmRec __unused;
     };
 #endif /*QCOM_VOIP_ENABLED*/
             static const uint32_t inputSamplingRates[];

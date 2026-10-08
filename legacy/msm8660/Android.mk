@@ -45,7 +45,6 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_ARM_MODE := arm
-LOCAL_CLANG := false
 LOCAL_CFLAGS := -D_POSIX_SOURCE
 
 LOCAL_SRC_FILES := \
@@ -88,7 +87,7 @@ LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 LOCAL_CFLAGS += $(msm8660_audio_cflags)
-# CM12.1 public audio/Mutex headers trigger these diagnostics with GCC 4.8.
+# Keep legacy public-header diagnostics scoped to this primary HAL.
 LOCAL_CFLAGS += -Wno-error=missing-field-initializers -Wno-error=narrowing
 LOCAL_CFLAGS += -Wno-error=unused-parameter -Wno-error=unused-variable
 

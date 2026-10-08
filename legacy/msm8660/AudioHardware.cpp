@@ -276,7 +276,7 @@ static uint32_t fmDevice = INVALID_DEVICE;
 #ifdef QCOM_ACDB_ENABLED
 #define ACDB_ID(X) device_list[X].acdb_id
 #endif
-#define CAPABILITY(X) device_list[X].capability
+#define DEVICE_CAPABILITY(X) device_list[X].capability
 
 void addToTable(int decoder_id,int device_id,int device_id_tx,int stream_type,bool active) {
     Routing_table* temp_ptr;
@@ -502,7 +502,7 @@ static status_t updateDeviceInfo(int rx_device,int tx_device) {
                 if(isRxDeviceEnabled == false) {
                     enableDevice(rx_device,1);
 #ifdef QCOM_ACDB_ENABLED
-                    acdb_loader_send_audio_cal(ACDB_ID(rx_device), CAPABILITY(rx_device));
+                    acdb_loader_send_audio_cal(ACDB_ID(rx_device), DEVICE_CAPABILITY(rx_device));
 #endif
                     isRxDeviceEnabled = true;
                 }
@@ -530,7 +530,7 @@ static status_t updateDeviceInfo(int rx_device,int tx_device) {
                     enableDevice(temp_ptr->dev_id,0);
                     enableDevice(tx_device,1);
 #ifdef QCOM_ACDB_ENABLED
-                    acdb_loader_send_audio_cal(ACDB_ID(tx_device), CAPABILITY(tx_device));
+                    acdb_loader_send_audio_cal(ACDB_ID(tx_device), DEVICE_CAPABILITY(tx_device));
 #endif
                     isTxDeviceEnabled = true;
                 }
@@ -2906,7 +2906,7 @@ status_t AudioHardware::enableFM(int sndDevice)
     }
 #ifdef QCOM_ACDB_ENABLED
     acdb_loader_send_audio_cal(ACDB_ID(DEVICE_FMRADIO_STEREO_TX),
-    CAPABILITY(DEVICE_FMRADIO_STEREO_TX));
+    DEVICE_CAPABILITY(DEVICE_FMRADIO_STEREO_TX));
 #endif
     if(msm_route_stream(PCM_PLAY, session_id, DEV_ID(DEVICE_FMRADIO_STEREO_TX), 1)) {
            ALOGE("msm_route_stream failed");
@@ -2916,7 +2916,7 @@ status_t AudioHardware::enableFM(int sndDevice)
     if(sndDevice == mCurSndDevice || mCurSndDevice == -1) {
         enableDevice(cur_rx, 1);
 #ifdef QCOM_ACDB_ENABLED
-        acdb_loader_send_audio_cal(ACDB_ID(cur_rx), CAPABILITY(cur_rx));
+        acdb_loader_send_audio_cal(ACDB_ID(cur_rx), DEVICE_CAPABILITY(cur_rx));
 #endif
         msm_route_stream(PCM_PLAY,session_id,DEV_ID(cur_rx),1);
     }
@@ -3590,7 +3590,7 @@ ssize_t AudioHardware::AudioStreamOutMSM8x60::write(const void* buffer, size_t b
                 return 0;
             }
 #ifdef QCOM_ACDB_ENABLED
-            acdb_loader_send_audio_cal(ACDB_ID(cur_rx), CAPABILITY(cur_rx));
+            acdb_loader_send_audio_cal(ACDB_ID(cur_rx), DEVICE_CAPABILITY(cur_rx));
 #endif
             if(msm_route_stream(PCM_PLAY, dec_id, DEV_ID(cur_rx), 1)) {
                 ALOGE("msm_route_stream failed");
@@ -4758,7 +4758,7 @@ status_t AudioHardware::AudioSessionOutLPA::start( )
 
     ALOGE("msm_route_stream(PCM_PLAY,%d,%d,0)",sessionId,DEV_ID(cur_rx));
 #ifdef QCOM_ACDB_ENABLED
-    acdb_loader_send_audio_cal(ACDB_ID(cur_rx), CAPABILITY(cur_rx));
+    acdb_loader_send_audio_cal(ACDB_ID(cur_rx), DEVICE_CAPABILITY(cur_rx));
 #endif
     if(msm_route_stream(PCM_PLAY,sessionId,DEV_ID(cur_rx),1)) {
         ALOGE("msm_route_stream(PCM_PLAY,%d,%d,1) failed",sessionId,DEV_ID(cur_rx));
@@ -5567,7 +5567,7 @@ status_t AudioHardware::AudioSessionOutTunnel::start( )
 
         ALOGV("AudioSessionOutTunnel::start:msm_route_stream(PCM_PLAY,%d,%d,0)",sessionId,DEV_ID(cur_rx));
 #ifdef QCOM_ACDB_ENABLED
-        acdb_loader_send_audio_cal(ACDB_ID(cur_rx), CAPABILITY(cur_rx));
+        acdb_loader_send_audio_cal(ACDB_ID(cur_rx), DEVICE_CAPABILITY(cur_rx));
 #endif
         if(msm_route_stream(PCM_PLAY,sessionId,DEV_ID(cur_rx),1)) {
             ALOGE("AudioSessionOutTunnel::start:msm_route_stream(PCM_PLAY,%d,%d,1) failed",sessionId,DEV_ID(cur_rx));
@@ -6034,7 +6034,7 @@ ssize_t AudioHardware::AudioStreamInMSM8x60::read( void* buffer, ssize_t bytes)
              }
 
             acdb_loader_send_audio_cal(ACDB_ID(DEVICE_FMRADIO_STEREO_TX),
-            CAPABILITY(DEVICE_FMRADIO_STEREO_TX));
+            DEVICE_CAPABILITY(DEVICE_FMRADIO_STEREO_TX));
 
             ALOGV("route FM");
             if(msm_route_stream(PCM_REC, dec_id, DEV_ID(DEVICE_FMRADIO_STEREO_TX), 1)) {
@@ -6072,7 +6072,7 @@ ssize_t AudioHardware::AudioStreamInMSM8x60::read( void* buffer, ssize_t bytes)
                      return -1;
                  }
 #ifdef QCOM_ACDB_ENABLED
-                 acdb_loader_send_audio_cal(ACDB_ID(cur_tx), CAPABILITY(cur_tx));
+                 acdb_loader_send_audio_cal(ACDB_ID(cur_tx), DEVICE_CAPABILITY(cur_tx));
 #endif
                  if(msm_route_stream(PCM_REC, dec_id, DEV_ID(cur_tx), 1)) {
                     ALOGE("msm_route_stream failed");

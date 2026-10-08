@@ -3,40 +3,42 @@
 
 LOCAL_PATH := $(call my-dir)
 
+msm8660_audio_cflags :=
+
 ifeq ($(BOARD_HAVE_BLUETOOTH),true)
-  common_cflags += -DWITH_A2DP
+  msm8660_audio_cflags += -DWITH_A2DP
 endif
 
 ifeq ($(QCOM_FM_ENABLED),true)
-  common_cflags += -DQCOM_FM_ENABLED
+  msm8660_audio_cflags += -DQCOM_FM_ENABLED
 endif
 
 ifneq ($(BOARD_QCOM_TUNNEL_LPA_ENABLED),false)
-  common_cflags += -DQCOM_TUNNEL_LPA_ENABLED
+  msm8660_audio_cflags += -DQCOM_TUNNEL_LPA_ENABLED
 endif
 
 ifeq ($(BOARD_QCOM_VOIP_ENABLED),true)
-  common_cflags += -DQCOM_VOIP_ENABLED
+  msm8660_audio_cflags += -DQCOM_VOIP_ENABLED
 endif
 
 ifeq ($(BOARD_QCOM_TUNNEL_PLAYBACK_ENABLED),true)
-  common_cflags += -DTUNNEL_PLAYBACK
+  msm8660_audio_cflags += -DTUNNEL_PLAYBACK
 endif
 
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
-  common_cflags += -DQCOM_ACDB_ENABLED
+  msm8660_audio_cflags += -DQCOM_ACDB_ENABLED
 endif
 
 ifeq ($(BOARD_HAVE_SAMSUNG_AUDIO),true)
-  common_cflags += -DSAMSUNG_AUDIO
+  msm8660_audio_cflags += -DSAMSUNG_AUDIO
 endif
 
 ifeq ($(BOARD_HAVE_SONY_AUDIO),true)
-  common_cflags += -DSONY_AUDIO
+  msm8660_audio_cflags += -DSONY_AUDIO
 endif
 
 ifeq ($(BOARD_HAVE_BACK_MIC_CAMCORDER),true)
-  common_cflags += -DBACK_MIC_CAMCORDER
+  msm8660_audio_cflags += -DBACK_MIC_CAMCORDER
 endif
 
 
@@ -85,7 +87,7 @@ LOCAL_C_INCLUDES += system/core/include
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
-LOCAL_CFLAGS += $(common_cflags)
+LOCAL_CFLAGS += $(msm8660_audio_cflags)
 # CM12.1 public audio/Mutex headers trigger these diagnostics with GCC 4.8.
 LOCAL_CFLAGS += -Wno-error=missing-field-initializers -Wno-error=narrowing
 LOCAL_CFLAGS += -Wno-error=unused-parameter -Wno-error=unused-variable

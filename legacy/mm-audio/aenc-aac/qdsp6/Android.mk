@@ -29,6 +29,10 @@ LOCAL_MODULE            := libOmxAacEnc
 LOCAL_VENDOR_MODULE := true
 LOCAL_MODULE_TAGS       := optional
 LOCAL_CFLAGS            := $(libOmxAacEnc-def)
+# Keep existing CAF diagnostics visible under Pie's default -Werror.
+LOCAL_CFLAGS += -Wno-error=format -Wno-error=format-extra-args \
+                -Wno-error=reorder -Wno-error=null-conversion \
+                -Wno-error=parentheses-equality
 LOCAL_C_INCLUDES        := $(libOmxAacEnc-inc)
 LOCAL_SHARED_LIBRARIES  := libutils liblog
 

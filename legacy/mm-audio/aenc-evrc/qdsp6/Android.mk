@@ -24,7 +24,6 @@ endif
 include $(CLEAR_VARS)
 
 libOmxEvrcEnc-inc       := $(LOCAL_PATH)/inc
-libOmxEvrcEnc-inc       += $(TARGET_OUT_HEADERS)/mm-core/omxcore
 
 LOCAL_MODULE            := libOmxEvrcEnc
 LOCAL_VENDOR_MODULE := true
@@ -36,6 +35,7 @@ LOCAL_CFLAGS += -Wno-error=format -Wno-error=format-extra-args \
                 -Wno-error=parentheses-equality
 LOCAL_C_INCLUDES        := $(libOmxEvrcEnc-inc)
 LOCAL_SHARED_LIBRARIES  := libutils liblog
+LOCAL_HEADER_LIBRARIES  := media_headers
 
 LOCAL_SRC_FILES         := src/aenc_svr.c
 LOCAL_SRC_FILES         += src/omx_evrc_aenc.cpp
@@ -75,4 +75,3 @@ endif
 # ---------------------------------------------------------------------------------
 #                     END
 # ---------------------------------------------------------------------------------
-

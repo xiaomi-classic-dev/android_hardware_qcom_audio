@@ -24,7 +24,6 @@ endif
 include $(CLEAR_VARS)
 
 libOmxAmrEnc-inc       := $(LOCAL_PATH)/inc
-libOmxAmrEnc-inc       += $(TARGET_OUT_HEADERS)/mm-core/omxcore
 
 LOCAL_MODULE            := libOmxAmrEnc
 LOCAL_VENDOR_MODULE := true
@@ -36,6 +35,7 @@ LOCAL_CFLAGS += -Wno-error=format -Wno-error=format-extra-args \
                 -Wno-error=parentheses-equality
 LOCAL_C_INCLUDES        := $(libOmxAmrEnc-inc)
 LOCAL_SHARED_LIBRARIES  := libutils liblog
+LOCAL_HEADER_LIBRARIES  := media_headers
 
 LOCAL_SRC_FILES         := src/aenc_svr.c
 LOCAL_SRC_FILES         += src/omx_amr_aenc.cpp
@@ -76,4 +76,3 @@ endif
 # ---------------------------------------------------------------------------------
 #                     END
 # ---------------------------------------------------------------------------------
-

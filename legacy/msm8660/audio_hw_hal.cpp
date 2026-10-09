@@ -415,16 +415,21 @@ static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
         reinterpret_cast<struct qcom_stream_in *>(stream);
     int val;
     AudioParameter parms = AudioParameter(String8(kvpairs));
-    String8 s8 = String8(kvpairs);
+
+    // The framework's legacy audio-patch fallback includes the input source
+    // and a built-in microphone address. This HAL selects its microphone by
+    // the routing device; the old stream rejects these extra metadata keys.
+    parms.remove(String8(AudioParameter::keyInputSource));
+    parms.remove(String8(AUDIO_BOTTOM_MICROPHONE_ADDRESS));
+    parms.remove(String8(AUDIO_BACK_MICROPHONE_ADDRESS));
 
     if (parms.getInt(String8(AUDIO_PARAMETER_STREAM_ROUTING), val) == NO_ERROR) {
         val = convert_audio_device(val, HAL_API_REV_2_0, HAL_API_REV_1_0);
         parms.remove(String8(AUDIO_PARAMETER_STREAM_ROUTING));
         parms.addInt(String8(AUDIO_PARAMETER_STREAM_ROUTING), val);
-        s8 = parms.toString();
     }
 
-    return in->qcom_in->setParameters(s8);
+    return in->qcom_in->setParameters(parms.toString());
 }
 
 static char * in_get_parameters(const struct audio_stream *stream,

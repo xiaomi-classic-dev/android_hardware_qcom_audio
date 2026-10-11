@@ -162,7 +162,7 @@ static audio_channel_mask_t out_get_channels(const struct audio_stream *stream)
 {
     const struct qcom_stream_out *out =
         reinterpret_cast<const struct qcom_stream_out *>(stream);
-    return out->qcom_out->channels();
+    return static_cast<audio_channel_mask_t>(out->qcom_out->channels());
 }
 
 static audio_format_t out_get_format(const struct audio_stream *stream)
@@ -376,7 +376,7 @@ static audio_channel_mask_t in_get_channels(const struct audio_stream *stream)
 {
     const struct qcom_stream_in *in =
         reinterpret_cast<const struct qcom_stream_in *>(stream);
-    return in->qcom_in->channels();
+    return static_cast<audio_channel_mask_t>(in->qcom_in->channels());
 }
 
 static audio_format_t in_get_format(const struct audio_stream *stream)
@@ -643,15 +643,18 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
     if (!out)
         return -ENOMEM;
 
-    devices = convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
+    const uint32_t legacy_devices =
+        convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
     status = static_cast<audio_output_flags_t> (flags);
 
     int format = static_cast<int>(config->format);
-    out->qcom_out = qadev->hwif->openOutputStream(devices, &format,
-                                                    &config->channel_mask,
+    uint32_t channels = static_cast<uint32_t>(config->channel_mask);
+    out->qcom_out = qadev->hwif->openOutputStream(legacy_devices, &format,
+                                                    &channels,
                                                     &config->sample_rate,
                                                     &status);
     config->format = static_cast<audio_format_t>(format);
+    config->channel_mask = static_cast<audio_channel_mask_t>(channels);
     if (!out->qcom_out) {
         ret = status;
         goto err_open;
@@ -722,15 +725,18 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     if (!in)
         return -ENOMEM;
 
-    devices = convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
+    const uint32_t legacy_devices =
+        convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
 
     int format = static_cast<int>(config->format);
-    in->qcom_in = qadev->hwif->openInputStream(devices, &format,
-                                    &config->channel_mask,
+    uint32_t channels = static_cast<uint32_t>(config->channel_mask);
+    in->qcom_in = qadev->hwif->openInputStream(legacy_devices, &format,
+                                    &channels,
                                     &config->sample_rate,
                                     &status,
                                     (AudioSystem::audio_in_acoustics)0);
     config->format = static_cast<audio_format_t>(format);
+    config->channel_mask = static_cast<audio_channel_mask_t>(channels);
     if (!in->qcom_in) {
         ret = status;
         goto err_open;

@@ -82,10 +82,10 @@ namespace android {
                 path = "/proc/asound/card";
                 path += ptr;
                 path += "/state";
-                ALOGD("Opening sound card state : %s", path.string());
-                fd = open(path.string(), O_RDONLY);
+                ALOGD("Opening sound card state : %s", path.c_str());
+                fd = open(path.c_str(), O_RDONLY);
                 if (fd == -1) {
-                    ALOGE("Open %s failed : %s", path.string(), strerror(errno));
+                    ALOGE("Open %s failed : %s", path.c_str(), strerror(errno));
                 } else {
                     /* returns vector of pair<sndcard, fd> */
                     sndcard = atoi(ptr);
@@ -236,7 +236,7 @@ namespace android {
             str += ",ONLINE";
         else
             str += ",OFFLINE";
-        ALOGV("%s: notifyAudioSystem : %s", __func__, str.string());
+        ALOGV("%s: notifyAudioSystem : %s", __func__, str.c_str());
         AudioSystem::setParameters(0, str);
     }
 }

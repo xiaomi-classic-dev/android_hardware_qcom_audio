@@ -985,7 +985,7 @@ String8 AudioSessionOutALSA::getParameters(const String8& keys)
         param.addInt(key, (int)mAlsaHandle->devices);
     }
 
-    ALOGV("getParameters() %s", param.toString().string());
+    ALOGV("getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 

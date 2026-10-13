@@ -329,7 +329,7 @@ String8 ALSAStreamOps::getParameters(const String8& keys)
                         ALOGD("Unsupported number of channels %d", info.AudioBlocksArray[i].nChannels);
                         break;
                     }
-                    if (!append.isEmpty()) {
+                    if (!append.empty()) {
                         value += (first ? append : String8("|") + append);
                         first = false;
                     }
@@ -355,7 +355,7 @@ String8 ALSAStreamOps::getParameters(const String8& keys)
                     ALOGD("Unsupported number of channels %d", info.AudioBlocksArray[i].nChannels);
                     break;
                 }
-                if (!append.isEmpty()) {
+                if (!append.empty()) {
                     value += (first ? append : String8("|") + append);
                     first = false;
                 }
@@ -366,7 +366,7 @@ String8 ALSAStreamOps::getParameters(const String8& keys)
 #endif
         param.add(key, value);
     }
-    ALOGV("getParameters() %s", param.toString().string());
+    ALOGV("getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 

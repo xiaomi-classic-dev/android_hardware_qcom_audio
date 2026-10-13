@@ -371,7 +371,7 @@ static char * out_get_parameters(const struct audio_stream *stream, const char *
         s8 = parms.toString();
     }
 
-    return strdup(s8.string());
+    return strdup(s8.c_str());
 }
 
 static uint32_t out_get_latency(const struct audio_stream_out *stream)
@@ -587,7 +587,7 @@ static char * in_get_parameters(const struct audio_stream *stream,
         s8 = parms.toString();
     }
 
-    return strdup(s8.string());
+    return strdup(s8.c_str());
 }
 
 static int in_set_gain(struct audio_stream_in *stream, float gain)
@@ -754,7 +754,7 @@ static char * adev_get_parameters(const struct audio_hw_device *dev,
     String8 s8;
 
     s8 = qadev->hwif->getParameters(String8(keys));
-    return strdup(s8.string());
+    return strdup(s8.c_str());
 }
 
 static size_t adev_get_input_buffer_size(const struct audio_hw_device *dev,

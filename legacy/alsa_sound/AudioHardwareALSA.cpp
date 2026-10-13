@@ -669,7 +669,7 @@ status_t AudioHardwareALSA::setParameters(const String8& keyValuePairs)
     uint32_t vsid = 0;
 
     int input = 0;
-    ALOGV("%s() ,%s", __func__, keyValuePairs.string());
+    ALOGV("%s() ,%s", __func__, keyValuePairs.c_str());
 
 #ifdef QCOM_ADSP_SSR_ENABLED
     key = String8(AudioParameter::keyADSPStatus);
@@ -724,7 +724,7 @@ status_t AudioHardwareALSA::setParameters(const String8& keyValuePairs)
         } else {
             mDevSettingsFlag |= TTY_OFF;
         }
-        ALOGI("Changed TTY Mode=%s", value.string());
+        ALOGI("Changed TTY Mode=%s", value.c_str());
         mALSADevice->setFlags(mDevSettingsFlag);
         if(mMode != AUDIO_MODE_IN_CALL){
            return NO_ERROR;
@@ -1087,7 +1087,7 @@ String8 AudioHardwareALSA::getParameters(const String8& keys)
         param.add(key, value);
     }
 
-    ALOGV("AudioHardwareALSA::getParameters() %s", param.toString().string());
+    ALOGV("AudioHardwareALSA::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 

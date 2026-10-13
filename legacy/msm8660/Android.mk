@@ -55,7 +55,6 @@ LOCAL_SHARED_LIBRARIES := \
     liblog          \
     libcutils       \
     libutils        \
-    libmedia        \
     libaudioalsa    \
     libacdbloader   \
     libacdbmapper
@@ -66,7 +65,7 @@ endif
 
 LOCAL_STATIC_LIBRARIES := \
     libmedia_helper \
-    libaudiohw_legacy
+    libaudiohw_legacy_mione
 
 LOCAL_MODULE := audio.primary.msm8660
 LOCAL_VENDOR_MODULE := true

@@ -25,6 +25,8 @@ endif
 # ---------------------------------------------------------------------------------
 
 include $(CLEAR_VARS)
+LOCAL_VENDOR_MODULE := true
+
 
 ifeq ($(BOARD_USES_QCOM_AUDIO_V2), true)
 mm-amr-dec-test-inc   += $(TARGET_OUT_HEADERS)/mm-audio/audio-alsa

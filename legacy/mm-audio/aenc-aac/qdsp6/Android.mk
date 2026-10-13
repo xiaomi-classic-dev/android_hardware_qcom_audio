@@ -49,6 +49,8 @@ include $(BUILD_SHARED_LIBRARY)
 # ---------------------------------------------------------------------------------
 
 include $(CLEAR_VARS)
+LOCAL_VENDOR_MODULE := true
+
 
 mm-aac-enc-test-inc    := $(LOCAL_PATH)/inc
 mm-aac-enc-test-inc    += $(LOCAL_PATH)/test

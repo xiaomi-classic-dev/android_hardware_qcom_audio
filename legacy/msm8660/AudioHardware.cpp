@@ -77,6 +77,14 @@
 #define INVALID_ACDB_ID -1
 #endif
 
+#include <cmath>
+// Keep the legacy voice-volume scale without linking system libaudioclient.
+// Formula from AOSP AudioSystem::logToLinear (media/libaudioclient).
+static int mioneLogToLinear(float volume) {
+    constexpr float dbConvert = -0.5f * 2.302585093f / 20.0f;
+    return volume ? 100 - int((1.0f / dbConvert) * std::log(volume) + 0.5f) : 0;
+}
+
 namespace android_audio_legacy {
 
 Mutex   mDeviceSwitchLock;
@@ -1789,7 +1797,7 @@ status_t AudioHardware::setVoiceVolume(float v)
 #ifdef QCOM_FM_ENABLED
 status_t AudioHardware::setFmVolume(float v)
 {
-    int vol = android::AudioSystem::logToLinear( (v?(v + 0.005):v) );
+    int vol = mioneLogToLinear( (v?(v + 0.005):v) );
     if ( vol > 100 ) {
         vol = 100;
     }

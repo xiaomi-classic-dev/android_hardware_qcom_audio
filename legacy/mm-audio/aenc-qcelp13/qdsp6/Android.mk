@@ -52,6 +52,8 @@ include $(BUILD_SHARED_LIBRARY)
 # ---------------------------------------------------------------------------------
 
 include $(CLEAR_VARS)
+LOCAL_VENDOR_MODULE := true
+
 
 mm-qcelp13-enc-test-inc    := $(LOCAL_PATH)/inc
 mm-qcelp13-enc-test-inc    += $(LOCAL_PATH)/test

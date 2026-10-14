@@ -29,7 +29,6 @@
 #include <dlfcn.h>
 #include <fcntl.h>
 #include "AudioHardware.h"
-#include <media/AudioSystem.h>
 #include <cutils/properties.h>
 
 #include <linux/android_pmem.h>
@@ -1376,7 +1375,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
     const char EFFECT_ENABLED[] = "sound_effect_enable";
 #endif
 
-    ALOGV("setParameters() %s", keyValuePairs.string());
+    ALOGV("setParameters() %s", keyValuePairs.c_str());
 
     if (keyValuePairs.length() == 0) return BAD_VALUE;
 
@@ -1404,16 +1403,16 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
         mBluetoothIdTx = 0;
         mBluetoothIdRx = 0;
         for (int i = 0; i < mNumBTEndpoints; i++) {
-            if (!strcasecmp(value.string(), mBTEndpoints[i].name)) {
+            if (!strcasecmp(value.c_str(), mBTEndpoints[i].name)) {
                 mBluetoothIdTx = mBTEndpoints[i].tx;
                 mBluetoothIdRx = mBTEndpoints[i].rx;
-                ALOGD("Using custom acoustic parameters for %s", value.string());
+                ALOGD("Using custom acoustic parameters for %s", value.c_str());
                 break;
             }
         }
         if (mBluetoothIdTx == 0) {
             ALOGD("Using default acoustic parameters "
-                 "(%s not in acoustic database)", value.string());
+                 "(%s not in acoustic database)", value.c_str());
         }
 #endif
         doRouting(NULL, 0);
@@ -1445,7 +1444,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
         if(mMode != AUDIO_MODE_IN_CALL){
            return NO_ERROR;
         }
-        ALOGI("Changed TTY Mode=%s", value.string());
+        ALOGI("Changed TTY Mode=%s", value.c_str());
         if((mMode == AUDIO_MODE_IN_CALL) &&
            (cur_rx == DEVICE_HEADSET_RX) &&
            (cur_tx == DEVICE_HEADSET_TX))
@@ -1454,21 +1453,21 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
 #ifdef HTC_ACOUSTIC_AUDIO
     key = String8(ACTIVE_AP);
     if (param.get(key, value) == NO_ERROR) {
-        const char* active_ap = value.string();
+        const char* active_ap = value.c_str();
         ALOGD("Active AP = %s", active_ap);
         strcpy(mActiveAP, active_ap);
 
         const char* dsp_effect = "\0";
         key = String8(DSP_EFFECT_KEY);
         if (param.get(key, value) == NO_ERROR) {
-            ALOGD("DSP Effect = %s", value.string());
-            dsp_effect = value.string();
+            ALOGD("DSP Effect = %s", value.c_str());
+            dsp_effect = value.c_str();
             strcpy(mEffect, dsp_effect);
         }
 
         key = String8(EFFECT_ENABLED);
         if (param.get(key, value) == NO_ERROR) {
-            const char* sound_effect_enable = value.string();
+            const char* sound_effect_enable = value.c_str();
             ALOGD("Sound Effect Enabled = %s", sound_effect_enable);
             if (value == "on") {
                 mEffectEnabled = true;
@@ -1667,7 +1666,7 @@ String8 AudioHardware::getParameters(const String8& keys)
         param.add(key, value);
     }
 #endif
-    ALOGV("AudioHardware::getParameters() %s", param.toString().string());
+    ALOGV("AudioHardware::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 
@@ -2995,7 +2994,7 @@ status_t AudioHardware::dumpInternals(int fd, const Vector<String16>& args __unu
     result.append(buffer);
     snprintf(buffer, SIZE, "\tmBluetoothId: %d\n", mBluetoothId);
     result.append(buffer);
-    ::write(fd, result.string(), result.size());
+    ::write(fd, result.c_str(), result.size());
     return NO_ERROR;
 }
 
@@ -3394,7 +3393,7 @@ status_t AudioHardware::AudioStreamInVoip::dump(int fd, const Vector<String16>& 
     result.append(buffer);
     snprintf(buffer, SIZE, "\tmRetryCount: %d\n", mRetryCount);
     result.append(buffer);
-    ::write(fd, result.string(), result.size());
+    ::write(fd, result.c_str(), result.size());
     return NO_ERROR;
 }
 
@@ -3404,7 +3403,7 @@ status_t AudioHardware::AudioStreamInVoip::setParameters(const String8& keyValue
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    ALOGV("AudioStreamInVoip::setParameters() %s", keyValuePairs.string());
+    ALOGV("AudioStreamInVoip::setParameters() %s", keyValuePairs.c_str());
 
     if (param.getInt(key, device) == NO_ERROR) {
         ALOGV("set input routing %x", device);
@@ -3439,7 +3438,7 @@ String8 AudioHardware::AudioStreamInVoip::getParameters(const String8& keys)
         param.addInt(key, true);
     }
 
-    ALOGV("AudioStreamInVoip::getParameters() %s", param.toString().string());
+    ALOGV("AudioStreamInVoip::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 
@@ -3724,7 +3723,7 @@ status_t AudioHardware::AudioStreamOutMSM8x60::dump(int fd, const Vector<String1
     result.append(buffer);
     snprintf(buffer, SIZE, "\tmStandby: %s\n", mStandby? "true": "false");
     result.append(buffer);
-    ::write(fd, result.string(), result.size());
+    ::write(fd, result.c_str(), result.size());
     return NO_ERROR;
 }
 
@@ -3740,7 +3739,7 @@ status_t AudioHardware::AudioStreamOutMSM8x60::setParameters(const String8& keyV
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    ALOGV("AudioStreamOutMSM8x60::setParameters() %s", keyValuePairs.string());
+    ALOGV("AudioStreamOutMSM8x60::setParameters() %s", keyValuePairs.c_str());
 
     if (param.getInt(key, device) == NO_ERROR) {
         mDevices = device;
@@ -3766,7 +3765,7 @@ String8 AudioHardware::AudioStreamOutMSM8x60::getParameters(const String8& keys)
         param.addInt(key, (int)mDevices);
     }
 
-    ALOGV("AudioStreamOutMSM8x60::getParameters() %s", param.toString().string());
+    ALOGV("AudioStreamOutMSM8x60::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 
@@ -4073,7 +4072,7 @@ status_t AudioHardware::AudioStreamOutDirect::dump(int fd, const Vector<String16
     result.append(buffer); 
     snprintf(buffer, SIZE, "\tmStandby: %s\n", mStandby? "true": "false");
     result.append(buffer); 
-    ::write(fd, result.string(), result.size());
+    ::write(fd, result.c_str(), result.size());
     return NO_ERROR;
 }   
 
@@ -4089,7 +4088,7 @@ status_t AudioHardware::AudioStreamOutDirect::setParameters(const String8& keyVa
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    ALOGV("AudioStreamOutDirect::setParameters() %s", keyValuePairs.string());
+    ALOGV("AudioStreamOutDirect::setParameters() %s", keyValuePairs.c_str());
     
     if (param.getInt(key, device) == NO_ERROR) {
         mDevices = device;
@@ -4120,7 +4119,7 @@ String8 AudioHardware::AudioStreamOutDirect::getParameters(const String8& keys)
         param.addInt(key, true);
     }
 
-    ALOGV("AudioStreamOutDirect::getParameters() %s", param.toString().string());
+    ALOGV("AudioStreamOutDirect::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 
@@ -4315,7 +4314,7 @@ status_t AudioHardware::AudioSessionOutLPA::setParameters(const String8& keyValu
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    ALOGE("AudioSessionOutLPA::setParameters() %s", keyValuePairs.string());
+    ALOGE("AudioSessionOutLPA::setParameters() %s", keyValuePairs.c_str());
 
     if (param.getInt(key, device) == NO_ERROR) {
         mDevices = device;
@@ -4341,7 +4340,7 @@ String8 AudioHardware::AudioSessionOutLPA::getParameters(const String8& keys)
         param.addInt(key, (int)mDevices);
     }
 
-    ALOGV("AudioSessionOutLPA::getParameters() %s", param.toString().string());
+    ALOGV("AudioSessionOutLPA::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 
@@ -5150,7 +5149,7 @@ status_t AudioHardware::AudioSessionOutTunnel::setParameters(const String8& keyV
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    ALOGV("AudioSessionOutTunnel::setParameters() %s", keyValuePairs.string());
+    ALOGV("AudioSessionOutTunnel::setParameters() %s", keyValuePairs.c_str());
 
     if (param.getInt(key, device) == NO_ERROR) {
         mDevices = device;
@@ -5176,7 +5175,7 @@ String8 AudioHardware::AudioSessionOutTunnel::getParameters(const String8& keys)
         param.addInt(key, (int)mDevices);
     }
 
-    ALOGV("AudioSessionOutTunnel::getParameters() %s", param.toString().string());
+    ALOGV("AudioSessionOutTunnel::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 
@@ -6261,7 +6260,7 @@ status_t AudioHardware::AudioStreamInMSM8x60::dump(int fd, const Vector<String16
     result.append(buffer);
     snprintf(buffer, SIZE, "\tmRetryCount: %d\n", mRetryCount);
     result.append(buffer);
-    ::write(fd, result.string(), result.size());
+    ::write(fd, result.c_str(), result.size());
     return NO_ERROR;
 }
 
@@ -6271,7 +6270,7 @@ status_t AudioHardware::AudioStreamInMSM8x60::setParameters(const String8& keyVa
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
-    ALOGV("AudioStreamInMSM8x60::setParameters() %s", keyValuePairs.string());
+    ALOGV("AudioStreamInMSM8x60::setParameters() %s", keyValuePairs.c_str());
 
     if (param.getInt(String8("vr_mode"), mForVR) == NO_ERROR)
         ALOGV("voice_recognition=%d", mForVR);
@@ -6304,7 +6303,7 @@ String8 AudioHardware::AudioStreamInMSM8x60::getParameters(const String8& keys)
         param.addInt(key, (int)mDevices);
     }
 
-    ALOGV("AudioStreamInMSM8x60::getParameters() %s", param.toString().string());
+    ALOGV("AudioStreamInMSM8x60::getParameters() %s", param.toString().c_str());
     return param.toString();
 }
 

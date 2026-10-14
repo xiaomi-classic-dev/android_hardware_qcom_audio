@@ -67,6 +67,8 @@ LOCAL_STATIC_LIBRARIES := \
     libmedia_helper \
     libaudiohw_legacy_mione
 
+LOCAL_HEADER_LIBRARIES := libhardware_headers libhardware_legacy_headers
+
 LOCAL_MODULE := audio.primary.msm8660
 LOCAL_VENDOR_MODULE := true
 LOCAL_MODULE_RELATIVE_PATH := hw

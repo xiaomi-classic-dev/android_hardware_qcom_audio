@@ -84,7 +84,7 @@ LOCAL_C_INCLUDES += hardware/libhardware_legacy/include
 LOCAL_C_INCLUDES += frameworks/base/include
 LOCAL_C_INCLUDES += system/core/include
 
-LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
+LOCAL_C_INCLUDES += 
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 LOCAL_CFLAGS += $(msm8660_audio_cflags)
@@ -92,4 +92,5 @@ LOCAL_CFLAGS += $(msm8660_audio_cflags)
 LOCAL_CFLAGS += -Wno-error=missing-field-initializers -Wno-error=narrowing
 LOCAL_CFLAGS += -Wno-error=unused-parameter -Wno-error=unused-variable
 
+LOCAL_CFLAGS += -idirafter $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 include $(BUILD_SHARED_LIBRARY)

@@ -182,7 +182,7 @@ LOCAL_C_INCLUDES += frameworks/base/include
 LOCAL_C_INCLUDES += system/core/include
 LOCAL_C_INCLUDES += system/media/audio_utils/include
 
-LOCAL_C_INCLUDES += 
+LOCAL_C_INCLUDES +=
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 ifeq ($(TARGET_BOARD_PLATFORM),msm8974)

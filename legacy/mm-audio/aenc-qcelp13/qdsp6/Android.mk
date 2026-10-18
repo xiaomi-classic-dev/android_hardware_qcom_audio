@@ -40,7 +40,7 @@ LOCAL_HEADER_LIBRARIES  := media_headers
 LOCAL_SRC_FILES         := src/aenc_svr.c
 LOCAL_SRC_FILES         += src/omx_qcelp13_aenc.cpp
 
-LOCAL_C_INCLUDES += 
+LOCAL_C_INCLUDES +=
 LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 
